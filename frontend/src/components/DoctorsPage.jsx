@@ -2,11 +2,12 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { doctorsPageStyles } from "../assets/frontend/dummyStyles";
 import { Link } from "react-router-dom";
 import { Search, X, Medal, ChevronRight, ChevronUp, ChevronDown, PointerOff } from "lucide-react";
+import { defaultDoctors } from "../assets/frontend/defaultDoctors";
 
 const DoctorPage = () => {
   const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:4000";
 
-  const [allDoctors, setAllDoctors] = useState([]);
+  const [allDoctors, setAllDoctors] = useState(defaultDoctors);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
@@ -22,53 +23,53 @@ const DoctorPage = () => {
         const json = await res.json().catch(() => null);
 
         if (!res.ok) {
-          const msg =
-            (json && json.message) || `Failed to load doctors (${res.status})`;
-          if (mounted) {
-            setError(msg);
-            setAllDoctors([]);
-            setLoading(false);
-          }
-          return;
+          throw new Error("Failed to load from server");
         }
 
         const items = (json && (json.data || json.doctors || json)) || [];
-        const normalized = (Array.isArray(items) ? items : []).map((d) => {
-          const id = d._id || d.id;
-          const image =
-            d.imageUrl || d.image || d.imageSmall || d.imageSrc || "";
-          let available = true;
-          if (typeof d.availability === "string") {
-            available = d.availability.toLowerCase() === "available";
-          } else if (typeof d.available === "boolean") {
-            available = d.available;
-          } else if (typeof d.availability === "boolean") {
-            available = d.availability;
-          } else {
-            available = d.availability === "Available" || d.available === true;
-          }
-          return {
-            id,
-            name: d.name || "Unknown",
-            specialization: d.specialization || d.speciality || "",
-            image,
-            experience:
-              (d.experience ?? d.experience === 0) ? String(d.experience) : "—",
-            fee: d.fee ?? d.price ?? 0,
-            available,
-            raw: d,
-          };
-        });
+        if (Array.isArray(items) && items.length > 0) {
+          const normalized = items.map((d) => {
+            const id = d._id || d.id;
+            const image =
+              d.imageUrl || d.image || d.imageSmall || d.imageSrc || "";
+            let available = true;
+            if (typeof d.availability === "string") {
+              available = d.availability.toLowerCase() === "available";
+            } else if (typeof d.available === "boolean") {
+              available = d.available;
+            } else if (typeof d.availability === "boolean") {
+              available = d.availability;
+            } else {
+              available = d.availability === "Available" || d.available === true;
+            }
+            return {
+              id,
+              name: d.name || "Unknown",
+              specialization: d.specialization || d.speciality || "",
+              image,
+              experience:
+                (d.experience ?? d.experience === 0) ? String(d.experience) : "—",
+              fee: d.fee ?? d.price ?? 0,
+              available,
+              raw: d,
+            };
+          });
 
-        if (mounted) {
-          setAllDoctors(normalized);
-          setError("");
+          if (mounted) {
+            setAllDoctors(normalized);
+            setError("");
+          }
+        } else {
+          if (mounted) {
+            setAllDoctors(defaultDoctors);
+            setError("");
+          }
         }
       } catch (err) {
-        console.error("load doctors error:", err);
+        console.warn("load doctors error, falling back to default doctors:", err);
         if (mounted) {
-          setError("Network error while loading doctors.");
-          setAllDoctors([]);
+          setAllDoctors(defaultDoctors);
+          setError("");
         }
       } finally {
         if (mounted) setLoading(false);

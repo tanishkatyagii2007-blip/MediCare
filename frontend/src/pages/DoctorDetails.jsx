@@ -26,6 +26,7 @@ const ToastContainer = () => null;
 // Clerk client hooks
 import { useAuth, useUser } from "@clerk/clerk-react";
 import { doctorDetailStyles } from "../assets/frontend/dummyStyles";
+import { defaultDoctors } from "../assets/frontend/defaultDoctors";
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:4000";
 
@@ -169,7 +170,13 @@ export default function DoctorDetail() {
         const doc = payload?.data || null;
         if (mounted) setDoctor(doc);
       } catch (err) {
-        if (mounted) setError(err.message || "Failed to fetch doctor");
+        const found = defaultDoctors.find((d) => String(d.id) === String(id) || String(d._id) === String(id)) || location.state?.doctor || defaultDoctors[0];
+        if (mounted && found) {
+          setDoctor(found);
+          setError(null);
+        } else if (mounted) {
+          setError(err.message || "Failed to fetch doctor");
+        }
       } finally {
         if (mounted) setLoading(false);
       }
@@ -178,7 +185,7 @@ export default function DoctorDetail() {
     return () => {
       mounted = false;
     };
-  }, [id]);
+  }, [id, location.state]);
 
   const next7 = useMemo(() => getScheduleDates(doctor?.schedule), [doctor]);
   const fee = Number(doctor?.fee ?? doctor?.fees ?? 0);

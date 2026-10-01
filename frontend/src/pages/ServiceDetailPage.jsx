@@ -14,6 +14,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { serviceDetailStyles } from "../assets/frontend/dummyStyles";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import { defaultServices } from "../assets/frontend/defaultServices";
 
 const DEFAULT_HOST = import.meta.env.VITE_API_BASE_URL || "http://localhost:4000";
 
@@ -162,7 +163,18 @@ export default function ServiceDetailPage() {
         }
       } catch (err) {
         if (err.name === "AbortError") return;
-        if (mounted) setFetchError("Unable to fetch service details.");
+        const found = defaultServices.find((s) => String(s.id) === String(id) || String(s._id) === String(id)) || defaultServices[0];
+        if (mounted && found) {
+          const transformed = transformServiceShape(found);
+          setService(transformed);
+          if (transformed.dates && transformed.dates.length > 0) {
+            setSelectedDate(transformed.dates[0]);
+            setSelectedTime("");
+          }
+          setFetchError(null);
+        } else if (mounted) {
+          setFetchError("Unable to fetch service details.");
+        }
       } finally {
         if (mounted) setLoading(false);
       }

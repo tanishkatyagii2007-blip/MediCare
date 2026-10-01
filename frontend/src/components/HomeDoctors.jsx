@@ -2,10 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { homeDoctorsStyles } from "../assets/frontend/dummyStyles";
 import { Link } from "react-router-dom";
 import { Calendar, UserCheck, Stethoscope } from "lucide-react";
+import { defaultDoctors } from "../assets/frontend/defaultDoctors";
 
 const HomeDoctors = ({ previewCount = 8 }) => {
   const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:4000";
-  const [doctors, setDoctors] = useState([]);
+  const [doctors, setDoctors] = useState(defaultDoctors);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -20,45 +21,44 @@ const HomeDoctors = ({ previewCount = 8 }) => {
         const json = await res.json().catch(() => null);
 
         if (!res.ok) {
-          const msg =
-            (json && json.message) || `Failed to load doctors (${res.status})`;
-          if (!mounted) return;
-          setError(msg);
-          setDoctors([]);
-          setLoading(false);
-          return;
+          throw new Error("Failed to fetch from server");
         }
         const items = (json && (json.data || json.doctors || json)) || [];
-        const normalized = (Array.isArray(items) ? items : []).map((d) => {
-          const id = d._id || d.id;
-          const image =
-            d.imageUrl || d.image || d.imageSmall || d.imageSrc || "";
-          const available =
-            (typeof d.availability === "string"
-              ? d.availability.toLowerCase() === "available"
-              : typeof d.available === "boolean"
-                ? d.available
-                : d.availability === true) || d.availability === "Available";
-          return {
-            id,
-            name: d.name || "Unknown",
-            specialization: d.specialization || d.speciality || "",
-            image,
-            experience:
-              d.experience || d.experience === 0 ? String(d.experience) : "",
-            fee: d.fee ?? d.fees ?? d.price ?? 0,
-            available,
-            raw: d,
-          };
-        });
+        if (Array.isArray(items) && items.length > 0) {
+          const normalized = items.map((d) => {
+            const id = d._id || d.id;
+            const image =
+              d.imageUrl || d.image || d.imageSmall || d.imageSrc || "";
+            const available =
+              (typeof d.availability === "string"
+                ? d.availability.toLowerCase() === "available"
+                : typeof d.available === "boolean"
+                  ? d.available
+                  : d.availability === true) || d.availability === "Available";
+            return {
+              id,
+              name: d.name || "Unknown",
+              specialization: d.specialization || d.speciality || "",
+              image,
+              experience:
+                d.experience || d.experience === 0 ? String(d.experience) : "",
+              fee: d.fee ?? d.fees ?? d.price ?? 0,
+              available,
+              raw: d,
+            };
+          });
 
-        if (!mounted) return;
-        setDoctors(normalized);
+          if (!mounted) return;
+          setDoctors(normalized);
+        } else {
+          if (!mounted) return;
+          setDoctors(defaultDoctors);
+        }
       } catch (err) {
         if (!mounted) return;
-        console.error("load doctors error:", err);
-        setError("Network error while loading doctors.");
-        setDoctors([]);
+        console.warn("Could not reach backend, displaying default doctors:", err);
+        setDoctors(defaultDoctors);
+        setError("");
       } finally {
         if (mounted) setLoading(false);
       }

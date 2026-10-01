@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { servicePageStyles, serviceCardStyles } from "../assets/frontend/dummyStyles";
 import { Link } from "react-router-dom";
+import { defaultServices } from "../assets/frontend/defaultServices";
 
 const DEFAULT_HOST = import.meta.env.VITE_API_BASE_URL || "http://localhost:4000";
 
@@ -73,17 +74,22 @@ const ServicePage = ({ previewCount = 9999 }) => {
       }
 
       const items = (json && (json.data || json.services || json)) || [];
-      const normalized = (Array.isArray(items) ? items : []).map((s) => ({
-        id: s._id || s.id,
-        name: s.name || s.serviceName || "Unnamed Service",
-        image: s.imageUrl || s.image || s.imageSmall || "",
-        available: s.available !== false,
-        price: s.price,
-      }));
-
-      setServices(normalized);
+      if (Array.isArray(items) && items.length > 0) {
+        const normalized = items.map((s) => ({
+          id: s._id || s.id,
+          name: s.name || s.serviceName || "Unnamed Service",
+          image: s.imageUrl || s.image || s.imageSmall || "",
+          available: s.available !== false,
+          price: s.price,
+        }));
+        setServices(normalized);
+      } else {
+        setServices(defaultServices);
+      }
     } catch (err) {
-      setError(err.message || "Failed to load services.");
+      console.warn("Could not reach backend services, using defaults:", err);
+      setServices(defaultServices);
+      setError(null);
     } finally {
       setLoading(false);
     }
