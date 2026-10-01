@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { AlertTriangle, Clock, CheckCircle, XCircle, Image, Plus, Trash2, Calendar } from "lucide-react";
 
 const AddServices = ({ serviceId }) => {
-  const API_BASE = "http://localhost:4000";
+  const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:4000";
 
    const fileRef = useRef(null);
   const [imagePreview, setImagePreview] = useState(null);

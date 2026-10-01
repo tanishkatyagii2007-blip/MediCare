@@ -12,7 +12,7 @@ import {
   Clock,
 } from 'lucide-react';
 import { serviceAppointmentsStyles } from "../assets/dummyStyles";
-const API_BASE = "http://localhost:4000";
+const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:4000";
 
 function formatTwo(n) {
   return String(n).padStart(2, "0");

@@ -13,11 +13,14 @@ const app = express();
 const port = process.env.PORT || 4000;
 
 const FRONTEND_URL = process.env.FRONTEND_URL || "";
+const ADMIN_URL = process.env.ADMIN_URL || "";
 
 const allowedOrigins = [
   'http://localhost:3000',
   'http://localhost:5173',
+  'http://localhost:5174',
   ...(FRONTEND_URL ? [FRONTEND_URL.replace(/\/$/, "")] : []),
+  ...(ADMIN_URL ? [ADMIN_URL.replace(/\/$/, "")] : []),
 ];
 // Middlewares
 app.use(
