@@ -76,6 +76,11 @@ app.get("/", (req, res) => {
   res.send("API WORKING");
 });
 
-app.listen(port, () => {
-  console.log(`Server Started on http://localhost:${port}`);
-});
+// Local dev
+if (process.env.NODE_ENV !== "production" || !process.env.VERCEL) {
+  app.listen(port, () => {
+    console.log(`Server Started on http://localhost:${port}`);
+  });
+}
+
+export default app;
