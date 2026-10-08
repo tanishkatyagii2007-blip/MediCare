@@ -1,5 +1,4 @@
 import express from "express";
-import { clerkMiddleware, requireAuth } from "@clerk/express";
 
 import {
   cancelServiceAppointment,
@@ -23,15 +22,11 @@ serviceAppointmentRouter.get(
 
 serviceAppointmentRouter.post(
   "/",
-  clerkMiddleware(),
-  requireAuth(),
   createServiceAppointment
 );
 
 serviceAppointmentRouter.get(
   "/me",
-  clerkMiddleware(),
-  requireAuth(),
   getServiceAppointmentsByPatient
 );
 

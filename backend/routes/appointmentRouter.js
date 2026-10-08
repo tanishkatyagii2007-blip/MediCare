@@ -1,5 +1,4 @@
 import express from "express";
-import { clerkMiddleware, requireAuth } from "@clerk/express";
 import {
   confirmPayment,
   createAppointment,
@@ -22,15 +21,11 @@ appointmentRouter.get("/stats/summary", getStats);
 // authentic routes
 appointmentRouter.post(
   "/",
-  clerkMiddleware(),
-  requireAuth(),
   createAppointment
 );
 
 appointmentRouter.get(
   "/me",
-  clerkMiddleware(),
-  requireAuth(),
   getAppointmentsByPatient
 );
 
