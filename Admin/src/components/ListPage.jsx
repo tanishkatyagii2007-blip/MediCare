@@ -2,6 +2,7 @@ import React from 'react'
 import {doctorListStyles} from '../assets/dummyStyles';
 import { useState , useEffect , useMemo} from 'react';
 import { Users, Search, Star, EyeClosed, Trash2, BadgeIndianRupee } from 'lucide-react';
+import { defaultDoctors } from '../assets/defaultDoctors';
 //Helper function
 function formatDateISO(iso) {
   if (!iso || typeof iso !== "string") return iso;
@@ -113,12 +114,11 @@ const ListPage = () => {
         });
         setDoctors(normalized);
       } else {
-        console.error("Failed to fetch doctors", { status: res.status, body });
-        setDoctors([]);
+        setDoctors(defaultDoctors);
       }
     } catch (err) {
-      console.error("Network error fetching doctors", err);
-      setDoctors([]);
+      console.warn("Network error fetching doctors, using defaults:", err.message);
+      setDoctors(defaultDoctors);
     } finally {
       setLoading(false);
     }

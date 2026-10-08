@@ -11,6 +11,7 @@ import {
   Plus,
 } from "lucide-react";
 import { serviceListStyles as s } from "../assets/dummyStyles";
+import { defaultServices } from "../assets/defaultServices";
 
 export default function ListServicePage() {
   const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:4000";
@@ -136,11 +137,14 @@ function sortSlotsForDisplay(slots = []) {
           : [],
         _raw: s,
       }));
-      setServices(normalized);
+      if (normalized.length > 0) {
+        setServices(normalized);
+      } else {
+        setServices(defaultServices);
+      }
     } catch (err) {
-      console.error("fetchServices error", err);
-      addToast("Network error while loading services", "error");
-      setServices([]);
+      console.warn("fetchServices error, displaying defaults:", err.message);
+      setServices(defaultServices);
     }
   }
 

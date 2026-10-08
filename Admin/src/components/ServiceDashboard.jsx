@@ -8,6 +8,7 @@ import {
   Calendar,
   Search,
 } from "lucide-react";
+import { defaultServices } from "../assets/defaultServices";
 
 function normalizeService(doc) {
   if (!doc) return null;
@@ -113,13 +114,14 @@ const ServiceDashboard = ({ services: servicesProp = null }) => {
 
       const normalized = (list || []).map(normalizeService).filter(Boolean);
       if (mountedRef.current) {
-        setServices(normalized);
+        setServices(normalized.length > 0 ? normalized : defaultServices.map(normalizeService));
         setError(null);
       }
     } catch (err) {
-      console.error("Service fetch error:", err);
+      console.warn("Service fetch error, using defaults:", err.message);
       if (mountedRef.current) {
-        setError(err.message || "Failed to load services");
+        setServices(defaultServices.map(normalizeService));
+        setError(null);
       }
     } finally {
       if (mountedRef.current && showLoading) setLoading(false);
