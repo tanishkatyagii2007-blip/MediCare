@@ -69,6 +69,8 @@ function App() {
       <div className="overflow-x-hidden bg-white text-gray-900">
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/h" element={<Home />} />
+          <Route path="/home" element={<Home />} />
           <Route path="/doctors" element={<Doctors />} />
           <Route path="/doctors/:id" element={<DoctorDetails />} />
           <Route path="/services" element={<Service />} />
